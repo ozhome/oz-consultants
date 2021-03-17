@@ -36,7 +36,6 @@
     "react/jsx-props-no-spreading": "off",
     "react/prop-types": "off",
     "no-use-before-define": "off",
-    "prettier/prettier": "error",
     "no-unused-expressions": "off",
     "import/extensions": [
       "error",
@@ -45,7 +44,12 @@
         "ts": "never",
         "tsx": "never"
       }
-    ]
+    ],
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "camelcase": "off",
+    "no-plusplus":"error",
+    "prettier/prettier": "error"
   },
   "settings": {
     "import/resolver": {

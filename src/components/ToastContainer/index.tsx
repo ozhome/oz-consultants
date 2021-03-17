@@ -1,16 +1,17 @@
 import React from 'react';
 import { useTransition } from 'react-spring';
 
-import { ToastMessage } from '../../hooks/toast';
 import Toast from './Toast';
+
+import IToastMessage from '../../DTOS/IToastMessage';
 
 import { Container } from './styles';
 
-interface ToastContainerProps {
-  messages: ToastMessage[];
+interface IToastContainerProps {
+  messages: IToastMessage[];
 }
 
-const ToastContainer: React.FC<ToastContainerProps> = ({ messages }) => {
+const ToastContainer: React.FC<IToastContainerProps> = ({ messages }) => {
   const messageWithTransactions = useTransition(
     messages,
     message => message.id,

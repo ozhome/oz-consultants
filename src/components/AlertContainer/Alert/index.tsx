@@ -1,50 +1,60 @@
 import React, { useCallback } from 'react';
 import { FiXCircle } from 'react-icons/fi';
 
-import { AlertMessage, useAlert } from '../../../hooks/alert';
+import IAlertMessage from '../../../DTOS/IAlertMessage';
+import IAlertResult from '../../../DTOS/IAlertResult';
+import { useAlert } from '../../../hooks/alert';
 import Button from '../../Button';
 
-import { Container, Content, Title, Description, Buttons } from './styles';
+import { Container, Title, Description, Buttons } from './styles';
 
-interface AlertProps {
-  alert: AlertMessage;
+interface IAlertProps {
+  alert: IAlertMessage;
   style: React.CSSProperties;
 }
 
-const Alert: React.FC<AlertProps> = ({ alert, style }) => {
+const Alert: React.FC<IAlertProps> = ({ alert, style }) => {
   const { removeAlert } = useAlert();
 
-  const handleButton = useCallback(() => {
-    if (alert.button) alert.button({ name: 'test', ss: 5 });
-    removeAlert(alert.id);
-  }, [alert, removeAlert]);
+  const handleButton = useCallback(
+    (data?: IAlertResult) => {
+      if (alert.button) alert.button(data);
+      removeAlert(alert.id);
+    },
+    [alert, removeAlert],
+  );
 
   return (
     <Container style={style}>
-      <Content>
-        <Title>
-          <strong>{alert.title}</strong>
-          <button type="button" onClick={() => removeAlert(alert.id)}>
-            <FiXCircle />
-          </button>
-        </Title>
-        <Description>
-          {alert.custom ? (
-            <alert.custom {...alert.customProps} />
-          ) : (
-            <p>{alert.description}</p>
-          )}
-        </Description>
-        {alert.showButtons && (
-          <Buttons>
-            {alert.button && (
-              <Button onClick={() => removeAlert(alert.id)}>Cancelar</Button>
-            )}
-
-            <Button onClick={handleButton}>Confirmar</Button>
-          </Buttons>
+      <Title>
+        <strong>{alert.title}</strong>
+        <button
+          type="button"
+          onClick={() => handleButton({ result: 'cancel' })}
+        >
+          <FiXCircle />
+        </button>
+      </Title>
+      <Description>
+        {alert.custom ? (
+          <alert.custom {...alert.customProps} alert={handleButton} />
+        ) : (
+          <p>{alert.description}</p>
         )}
-      </Content>
+      </Description>
+      {!alert.hiddenButtons && (
+        <Buttons>
+          {alert.button && (
+            <Button onClick={() => handleButton({ result: 'cancel' })}>
+              Cancelar
+            </Button>
+          )}
+
+          <Button onClick={() => handleButton({ result: 'success' })}>
+            Confirmar
+          </Button>
+        </Buttons>
+      )}
     </Container>
   );
 };

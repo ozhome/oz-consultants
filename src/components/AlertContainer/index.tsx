@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTransition } from 'react-spring';
 
-import { AlertMessage } from '../../hooks/alert';
+import IAlertMessage from '../../DTOS/IAlertMessage';
 import Alert from './Alert';
 
 import { Container } from './styles';
 
 interface AlertContainerProps {
-  alerts: AlertMessage[];
+  alerts: IAlertMessage[];
 }
 
 const AlertContainer: React.FC<AlertContainerProps> = ({ alerts }) => {
@@ -17,7 +17,7 @@ const AlertContainer: React.FC<AlertContainerProps> = ({ alerts }) => {
     leave: { right: '-120%', opacity: 0 },
   });
   return (
-    <Container>
+    <Container id="modal">
       {messageWithTransactions.map(({ item, key, props }) => (
         <Alert key={key} style={props} alert={item} />
       ))}

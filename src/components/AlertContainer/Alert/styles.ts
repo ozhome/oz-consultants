@@ -2,27 +2,17 @@ import styled from 'styled-components';
 import { animated } from 'react-spring';
 
 export const Container = styled(animated.div)`
-  width: 100vw;
-  min-height: 100vh;
-
-  background-color: rgba(0, 0, 0, 0.3);
-
-  position: relative;
-  padding: 4rem 0;
-
-  justify-content: center;
-`;
-
-export const Content = styled.div`
-  width: 80%;
-  margin: 0 auto;
+  margin: 50px auto 0;
+  width: 50%;
   padding: 1rem;
-
   background-color: white;
 
   position: relative;
   border-radius: 0.7rem;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 769px) {
+    width: 90%;
+  }
 
   @media (max-width: 481px) {
     padding: 0.5rem;
@@ -54,7 +44,7 @@ export const Title = styled.div`
 `;
 
 export const Description = styled.div`
-  padding: 1.8rem 0;
+  padding: 1rem 0;
 
   @media (max-width: 481px) {
     padding: 1rem 0 1.8rem;
@@ -78,14 +68,6 @@ export const Buttons = styled.div`
 
     &:hover {
       background: #717478;
-    }
-  }
-
-  @media (max-width: 481px) {
-    justify-content: space-around;
-
-    button {
-      margin: 0;
     }
   }
 `;

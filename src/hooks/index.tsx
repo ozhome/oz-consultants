@@ -1,14 +1,20 @@
 import React from 'react';
-import { AuthProvider } from './auth';
 import { ToastProvider } from './toast';
 import { AlertProvider } from './alert';
+import { InventoryProvider } from './inventory';
+import { CartProvider } from './cart';
+import { StoreProvider } from './store';
 
 const AppProvider: React.FC = ({ children }) => (
-  <AuthProvider>
-    <AlertProvider>
-      <ToastProvider>{children}</ToastProvider>
-    </AlertProvider>
-  </AuthProvider>
+  <StoreProvider>
+    <InventoryProvider>
+      <CartProvider>
+        <ToastProvider>
+          <AlertProvider>{children}</AlertProvider>
+        </ToastProvider>
+      </CartProvider>
+    </InventoryProvider>
+  </StoreProvider>
 );
 
 export default AppProvider;

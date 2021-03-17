@@ -1,33 +1,26 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { v4 as uuid } from 'uuid';
 
 import AlertContainer from '../components/AlertContainer';
+import IAlertMessage from '../DTOS/IAlertMessage';
 
-export interface IGenericProp {
-  [key: string]: string | number;
-}
-
-export interface AlertMessage {
-  id: string;
-  title: string;
-  description?: string;
-  custom?: React.FC<any>;
-  customProps?: any;
-  showButtons?: boolean;
-  button?(info?: IGenericProp): Promise<void>;
-}
-
-interface AlertContextData {
-  addAlert(message: Omit<AlertMessage, 'id'>): void;
+interface IAlertContextData {
+  addAlert(message: Omit<IAlertMessage, 'id'>): void;
   removeAlert(id: string): void;
 }
 
-const AlertContext = createContext<AlertContextData>({} as AlertContextData);
+const AlertContext = createContext<IAlertContextData>({} as IAlertContextData);
 
 const AlertProvider: React.FC = ({ children }) => {
-  const [alerts, setAlerts] = useState<AlertMessage[]>([]);
+  const [alerts, setAlerts] = useState<IAlertMessage[]>([]);
 
-  const addAlert = useCallback((alert: Omit<AlertMessage, 'id'>) => {
+  const addAlert = useCallback((alert: Omit<IAlertMessage, 'id'>) => {
     const id = uuid();
 
     const newAlert = {
@@ -42,6 +35,13 @@ const AlertProvider: React.FC = ({ children }) => {
     setAlerts(state => state.filter(alert => alert.id !== id));
   }, []);
 
+  useEffect(() => {
+    const haveAlert = Boolean(alerts.length);
+    if (haveAlert) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'visible';
+    document.querySelector('#modal')?.classList.toggle('active', haveAlert);
+  }, [alerts]);
+
   return (
     <AlertContext.Provider value={{ addAlert, removeAlert }}>
       {children}
@@ -50,7 +50,7 @@ const AlertProvider: React.FC = ({ children }) => {
   );
 };
 
-function useAlert(): AlertContextData {
+function useAlert(): IAlertContextData {
   const context = useContext(AlertContext);
 
   if (!context) throw new Error('useAlert must be used within a AlertProvider');

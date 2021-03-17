@@ -2,25 +2,19 @@ import React, { createContext, useCallback, useContext, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import ToastContainer from '../components/ToastContainer';
+import IToastMessage from '../DTOS/IToastMessage';
 
-export interface ToastMessage {
-  id: string;
-  type?: 'success' | 'info' | 'error';
-  title: string;
-  description?: string;
-}
-
-interface ToastContextData {
-  addToast(message: Omit<ToastMessage, 'id'>): void;
+interface IToastContextData {
+  addToast(message: Omit<IToastMessage, 'id'>): void;
   removeToast(id: string): void;
 }
 
-const ToastContext = createContext<ToastContextData>({} as ToastContextData);
+const ToastContext = createContext<IToastContextData>({} as IToastContextData);
 
 const ToastProvider: React.FC = ({ children }) => {
-  const [messages, setMessages] = useState<ToastMessage[]>([]);
+  const [messages, setMessages] = useState<IToastMessage[]>([]);
 
-  const addToast = useCallback((message: Omit<ToastMessage, 'id'>) => {
+  const addToast = useCallback((message: Omit<IToastMessage, 'id'>) => {
     const id = uuid();
 
     const toast = {
@@ -43,7 +37,7 @@ const ToastProvider: React.FC = ({ children }) => {
   );
 };
 
-function useToast(): ToastContextData {
+function useToast(): IToastContextData {
   const context = useContext(ToastContext);
 
   if (!context) throw new Error('useToast must be used within a ToastProvider');
