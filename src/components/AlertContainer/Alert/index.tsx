@@ -17,7 +17,7 @@ const Alert: React.FC<IAlertProps> = ({ alert, style }) => {
   const { removeAlert } = useAlert();
 
   const handleButton = useCallback(
-    (data?: IAlertResult) => {
+    (data?: IAlertResult<any>) => {
       if (alert.button) alert.button(data);
       removeAlert(alert.id);
     },

@@ -6,41 +6,28 @@ import React, {
   useState,
 } from 'react';
 
-import { Product } from './inventory';
-
-interface IInfo {
-  name: string;
-  cpf: string;
-  email: string;
-}
+import IItem from '../DTOS/IItem';
 
 interface CartContextData {
-  cart: Product[];
-  info: IInfo;
-  setInfo(data: IInfo): void;
+  cart: IItem[];
   amount: number;
-  plusCart(item: Product): Product;
-  minusCart(item: Product): Product;
-  updateCart(item: Product): void;
+  plusCart(item: IItem): IItem;
+  minusCart(item: IItem): IItem;
+  updateCart(item: IItem): void;
   clearCart(): void;
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData);
 
 const CartProvider: React.FC = ({ children }) => {
-  const [cart, setCart] = useState<Product[]>([]);
-  const [info, setInfo] = useState<IInfo>({
-    cpf: '',
-    email: '',
-    name: '',
-  });
+  const [cart, setCart] = useState<IItem[]>([]);
   const [amount, setAmount] = useState(0);
 
   const plusCart = useCallback(
-    (item: Product) => {
+    (item: IItem) => {
       const index = cart.findIndex(product => product.id === item.id);
 
-      let products: Product[] = [];
+      let products: IItem[] = [];
       if (index >= 0) {
         products = cart.map(product => {
           if (product.id === item.id) {
@@ -62,7 +49,7 @@ const CartProvider: React.FC = ({ children }) => {
   );
 
   const minusCart = useCallback(
-    (item: Product) => {
+    (item: IItem) => {
       const index = cart.findIndex(product => product.id === item.id);
 
       if (index >= 0) {
@@ -87,7 +74,7 @@ const CartProvider: React.FC = ({ children }) => {
   );
 
   const updateCart = useCallback(
-    (item: Product) => {
+    (item: IItem) => {
       const index = cart.findIndex(product => product.id === item.id);
       if (index >= 0) {
         setCart(state =>
@@ -125,8 +112,6 @@ const CartProvider: React.FC = ({ children }) => {
     <CartContext.Provider
       value={{
         cart,
-        info,
-        setInfo,
         amount,
         plusCart,
         minusCart,

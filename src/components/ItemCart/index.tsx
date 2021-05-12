@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 
 import { useInventory } from '../../hooks/inventory';
@@ -20,7 +20,6 @@ import {
   ContainerItemText,
   ContainerQty,
   Image,
-  DescriptionText,
   Title,
 } from './styles';
 
@@ -29,10 +28,9 @@ interface ItemProps {
   openModal?(item: IItem): void;
 }
 
-const Item: React.FC<ItemProps> = ({ item, openModal }) => {
+const ItemCart: React.FC<ItemProps> = ({ item, openModal }) => {
   const { plusCart, minusCart } = useCart();
   const { updateInventory } = useInventory();
-  const maxCharacters = useRef(item.name.length > 40 ? 60 : 95);
 
   const handlePlus = useCallback(() => {
     if (item.quantity + 1 <= item.qty_available) {
@@ -60,11 +58,6 @@ const Item: React.FC<ItemProps> = ({ item, openModal }) => {
           <Image src={item.image} />
         </ImageContainer>
         <Info>
-          <DescriptionText>
-            {item.description_sale.length > maxCharacters.current
-              ? `${item.description_sale.substr(0, maxCharacters.current)}...`
-              : item.description_sale || ''}
-          </DescriptionText>
           <PriceContainer>
             <Price>{formatReal(item.price)}</Price>
           </PriceContainer>
@@ -73,7 +66,7 @@ const Item: React.FC<ItemProps> = ({ item, openModal }) => {
           <ButtonItem type="button" onClick={handleMinus}>
             <FiMinusCircle color="#000" size={40} />
           </ButtonItem>
-          <ContainerQty onClick={inputAdd}>
+          <ContainerQty type="button" onClick={inputAdd}>
             <ContainerItemText>{item.quantity}</ContainerItemText>
             <ContainerItemText>{item.to_weight ? 'g' : ''}</ContainerItemText>
           </ContainerQty>
@@ -86,4 +79,4 @@ const Item: React.FC<ItemProps> = ({ item, openModal }) => {
   );
 };
 
-export default Item;
+export default ItemCart;

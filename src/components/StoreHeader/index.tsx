@@ -65,7 +65,7 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
   }, [addToast, cart.length, openFinish]);
 
   const showCartResult = useCallback(
-    async (data: IAlertResult) => {
+    async (data: IAlertResult<null>) => {
       if (data.result === 'success') openFinish();
     },
     [openFinish],
@@ -125,7 +125,7 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
         <section>
           <h3>Contato</h3>
           <div>
-            <a href={`https://wa.me/${'+5541995245271'}`} target="__blank">
+            <a href={`https://wa.me/${store.phone}`} target="__blank">
               WhatsApp
             </a>
           </div>

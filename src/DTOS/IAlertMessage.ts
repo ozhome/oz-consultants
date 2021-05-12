@@ -7,5 +7,5 @@ export default interface IAlertMessage {
   custom?: React.FC<any>;
   customProps?: any;
   hiddenButtons?: boolean;
-  button?(info?: IAlertResult): Promise<void>;
+  button?(info?: IAlertResult<any>): Promise<void>;
 }

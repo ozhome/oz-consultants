@@ -1,13 +1,6 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
+import IStore from '../DTOS/IStore';
 import api from '../services/api';
-
-interface IStore {
-  name: string;
-  id: string;
-  cpf: string;
-  store: string;
-  type: 'go' | 'home';
-}
 
 interface IStoreContextData {
   store: IStore;
@@ -30,6 +23,7 @@ const StoreProvider: React.FC = ({ children }) => {
         store: 'colombo',
         cpf,
         type: 'go',
+        phone: '5541995245271',
       });
     }
   }, []);

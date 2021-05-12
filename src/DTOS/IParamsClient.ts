@@ -3,4 +3,5 @@ export default interface IParamsClient {
   email: string;
   phone: string;
   cpf: string;
+  address: string;
 }

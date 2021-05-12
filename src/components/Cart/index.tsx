@@ -18,7 +18,7 @@ const Cart: React.FC = () => {
   const { addAlert } = useAlert();
 
   const finish = useCallback(
-    async (data: IAlertResult) => {
+    async (data: IAlertResult<null>) => {
       if (data.result === 'success' && cart.length)
         addAlert({
           title: 'Dados pessoais',

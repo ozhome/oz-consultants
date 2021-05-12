@@ -1,40 +1,19 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
 import api from '../services/api';
 
-export interface Category {
-  id: string;
-  idOdoo: number;
-  image: string;
-  name: string;
-  parent_id?: number;
-  has_product?: boolean;
-}
-
-export interface Product {
-  id: string;
-  idOdoo: number;
-  name: string;
-  to_weight: boolean;
-  weight: number;
-  description_sale: string;
-  price: number;
-  pos_categ_id: number;
-  qty_available: number;
-  quantity: number;
-  image: string;
-  discount?: number;
-}
+import ICategory from '../DTOS/ICategory';
+import IItem from '../DTOS/IItem';
 
 interface InventoryContextData {
-  categories: Category[];
+  categories: ICategory[];
   selectedCateg: number;
   selectedSub: number;
-  products: Product[];
-  getInventory(items: Product[]): Promise<void>;
+  products: IItem[];
+  getInventory(items: IItem[]): Promise<void>;
   getCategories(): Promise<void>;
   selectedCategory(id: number): void;
   selectedSubcategory(id: number): void;
-  updateInventory(item: Product): void;
+  updateInventory(item: IItem): void;
   clearInventory(): void;
 }
 
@@ -45,8 +24,8 @@ const InventoryContext = createContext<InventoryContextData>(
 const InventoryProvider: React.FC = ({ children }) => {
   const [selectedCateg, setSelectedCateg] = useState(0);
   const [selectedSub, setSelectedSub] = useState(0);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<IItem[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
   const getCategories = useCallback(async () => {
     const { data } = await api.get('/categories/');
@@ -54,7 +33,7 @@ const InventoryProvider: React.FC = ({ children }) => {
   }, []);
 
   const getInventory = useCallback(
-    async (items: Product[]) => {
+    async (items: IItem[]) => {
       const categoriesWithProdu = categories
         .filter(ct => ct.parent_id === selectedCateg)
         .map(ct => ct.id);
@@ -65,7 +44,7 @@ const InventoryProvider: React.FC = ({ children }) => {
       const categoriesChildren = categories.map(category => {
         if (
           data.findIndex(
-            (product: Product) => product.pos_categ_id === category.idOdoo,
+            (product: IItem) => product.pos_categ_id === category.idOdoo,
           ) === -1
         ) {
           return { ...category, has_product: false };
@@ -76,13 +55,13 @@ const InventoryProvider: React.FC = ({ children }) => {
       const sub = categoriesChildren.find(ct => ct.has_product);
       setSelectedSub(sub?.idOdoo || 0);
 
-      const productsUpdate = data.map((product: Product) => {
+      const productsUpdate = data.map((product: IItem) => {
         const item = items.find(i => i.id === product.id);
         if (item) {
           return item;
         }
 
-        return product as Product;
+        return product as IItem;
       });
 
       setCategories(categoriesChildren);
@@ -109,7 +88,7 @@ const InventoryProvider: React.FC = ({ children }) => {
   );
 
   const updateInventory = useCallback(
-    (item: Product) => {
+    (item: IItem) => {
       let check = false;
       const productsUpdate = products.map(product => {
         if (product.id === item.id) {

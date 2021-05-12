@@ -5,14 +5,14 @@ import { FormHandles } from '@unform/core';
 import { useCart } from '../../hooks/cart';
 
 import Button from '../Button';
-import Item from '../Item';
+import Item from '../ItemCart';
 
 import IAlertResult from '../../DTOS/IAlertResult';
 
 import { Container, ButtonContainer } from './styles';
 
 interface IProps {
-  alert(data?: IAlertResult): void;
+  alert(data?: IAlertResult<null>): void;
 }
 
 const ShowCart: React.FC<IProps> = ({ alert }) => {
@@ -23,11 +23,12 @@ const ShowCart: React.FC<IProps> = ({ alert }) => {
   const handleSubmit = useCallback(async () => {
     alert({ result: 'success' });
   }, [alert]);
+
   return (
     <Container>
       <Form ref={formRef} onSubmit={handleSubmit}>
         {cart.map(item => (
-          <Item key={item.id} item={item} cart />
+          <Item key={item.id} item={item} />
         ))}
         <ButtonContainer>
           <Button type="button" onClick={() => alert({ result: 'cancel' })}>

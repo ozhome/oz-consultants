@@ -3,15 +3,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../../components/StoreHeader';
 import Item from '../../components/Item';
-import Cart from '../../components/Cart';
 import Modal from '../../components/Modal';
 import ModalInput from '../../components/ModalInput';
+import Cart from '../../components/Cart';
 
-import { Category, Product, useInventory } from '../../hooks/inventory';
+import { useInventory } from '../../hooks/inventory';
 import { useCart } from '../../hooks/cart';
+import { useAlert } from '../../hooks/alert';
+
+import ICategory from '../../DTOS/ICategory';
+import IItem from '../../DTOS/IItem';
 
 import { Categories, Container, Content } from './styles';
-import { useAlert } from '../../hooks/alert';
 
 const Items: React.FC = () => {
   const {
@@ -28,7 +31,7 @@ const Items: React.FC = () => {
   const [modal, setModal] = useState(true);
   const { addAlert } = useAlert();
 
-  const [data, setData] = useState<Category[]>(
+  const [data, setData] = useState<ICategory[]>(
     categories.filter(item => item.has_product),
   );
 
@@ -54,7 +57,7 @@ const Items: React.FC = () => {
   }, [categories]);
 
   const openModal = useCallback(
-    (item: Product) => {
+    (item: IItem) => {
       addAlert({
         title: `Informe a quantidade`,
         button: async () => {

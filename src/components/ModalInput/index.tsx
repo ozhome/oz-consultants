@@ -1,17 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Form } from '@unform/web';
-import { useCart } from '../../hooks/cart';
 
-import { Product, useInventory } from '../../hooks/inventory';
 import Input from '../Input';
 
-import { Content, Button, ButtonText } from './styles';
+import { useCart } from '../../hooks/cart';
+import { useInventory } from '../../hooks/inventory';
+
 import IAlertResult from '../../DTOS/IAlertResult';
+import IItem from '../../DTOS/IItem';
+
+import { Content, Button, ButtonText } from './styles';
 
 interface ModalProps {
   visible: boolean;
-  item: Product;
-  alert(data?: IAlertResult): void;
+  item: IItem;
+  alert(data?: IAlertResult<null>): void;
 }
 
 const ModalInput: React.FC<ModalProps> = ({ visible, item, alert }) => {

@@ -4,13 +4,15 @@ import { useHistory, useParams } from 'react-router-dom';
 import Category from '../../components/Category';
 import Header from '../../components/StoreHeader';
 import Modal from '../../components/Modal';
+import Cart from '../../components/Cart';
 
-import { Category as ICategory, useInventory } from '../../hooks/inventory';
+import { useInventory } from '../../hooks/inventory';
 import { useStore } from '../../hooks/store';
 import { useToast } from '../../hooks/toast';
 
+import ICategory from '../../DTOS/ICategory';
+
 import { Container, Content } from './styles';
-import Cart from '../../components/Cart';
 
 interface IRouteProps {
   cpf: string;

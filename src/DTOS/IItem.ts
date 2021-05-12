@@ -1,7 +1,14 @@
 export default interface IItem {
   id: string;
-  title: string;
+  idOdoo: number;
+  name: string;
+  to_weight: boolean;
+  weight: number;
+  description_sale: string;
+  price: number;
+  pos_categ_id: number;
+  qty_available: number;
   quantity: number;
-  unit_price: number;
-  tangible: boolean;
+  image: string;
+  discount?: number;
 }

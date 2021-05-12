@@ -67,7 +67,7 @@ const Home: React.FC = () => {
         <h2>Revendedores próximos a você</h2>
         <div>
           {consultants.map(user => (
-            <Consultant>
+            <Consultant key={user.id}>
               <img src={user.avatar_url} alt={user.name} />
               <div>
                 <Name>

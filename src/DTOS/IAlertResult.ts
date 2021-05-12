@@ -1,6 +1,7 @@
-export default interface IAlertResult {
+interface IData {
+  [key: string]: any;
+}
+export default interface IAlertResult<T> {
   result: 'success' | 'error' | 'cancel';
-  data?: {
-    [key: string]: string | number | boolean | undefined;
-  };
+  data?: T;
 }
