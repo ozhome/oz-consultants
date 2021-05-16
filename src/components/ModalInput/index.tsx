@@ -35,12 +35,6 @@ const ModalInput: React.FC<ModalProps> = ({ visible, item, alert }) => {
     if (quantity <= 0) {
       updateInventory({ ...item, quantity: 0 });
       updateCart({ ...item, quantity: 0 });
-    } else if (item.to_weight) {
-      updateInventory({ ...item, quantity });
-      updateCart({ ...item, quantity });
-    } else if (item.qty_available < quantity) {
-      updateInventory({ ...item, quantity: item.qty_available });
-      updateCart({ ...item, quantity: item.qty_available });
     } else {
       updateInventory({ ...item, quantity });
       updateCart({ ...item, quantity });
