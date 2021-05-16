@@ -37,7 +37,7 @@ const InventoryProvider: React.FC = ({ children }) => {
       const categoriesWithProdu = categories
         .filter(ct => ct.parent_id === selectedCateg)
         .map(ct => ct.id);
-      const { data } = await api.post('/products/', {
+      const { data } = await api.post('/products/all', {
         categories: categoriesWithProdu,
       });
 
