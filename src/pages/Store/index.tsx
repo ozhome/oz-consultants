@@ -41,7 +41,7 @@ const Store: React.FC = () => {
 
   useEffect(() => {
     const get = async () => {
-      if (store?.cpf === cpf) {
+      if (store?.document === cpf) {
         setModal(false);
         return;
       }

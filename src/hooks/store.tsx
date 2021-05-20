@@ -13,19 +13,9 @@ const StoreProvider: React.FC = ({ children }) => {
   const [store, setStore] = useState<IStore>({} as IStore);
 
   const findStore = useCallback(async (cpf: string) => {
-    try {
-      const { data } = await api.get(`/consultants/${cpf}`);
-      setStore(data);
-    } catch {
-      setStore({
-        name: 'Maria Clara',
-        id: 'id-aletatorio',
-        store: 'colombo',
-        cpf,
-        type: 'go',
-        phone: '5541995245271',
-      });
-    }
+    const { data } = await api.get(`/users/consultants/document/${cpf}`);
+    api.defaults.headers.ErpID = data.store;
+    setStore(data);
   }, []);
 
   return (

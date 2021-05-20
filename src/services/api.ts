@@ -4,6 +4,15 @@ const api = axios.create({
   baseURL: 'https://api-test.ozcandy.com.br',
 });
 
-api.defaults.headers.ErpID = '9875931d-7de9-4b1d-b745-8bee108698e8';
+api.interceptors.response.use(response => {
+  const { NewErpID, NewErpToken, NewErpExpires } = response.headers;
+
+  if (NewErpID && NewErpToken && NewErpExpires) {
+    api.defaults.headers.ErpID = NewErpID;
+    api.defaults.headers.ErpToken = NewErpToken;
+    api.defaults.headers.ErpExpires = NewErpExpires;
+  }
+  return response;
+});
 
 export default api;

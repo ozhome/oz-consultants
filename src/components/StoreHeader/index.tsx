@@ -88,7 +88,7 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
 
   return (
     <Container>
-      {store.type === 'go' ? (
+      {store.type === 'oz_go' ? (
         <img src={go} alt="Oz GO" />
       ) : (
         <img src={home} alt="Oz Home" />
