@@ -93,12 +93,6 @@ export const Consultant = styled.div`
     height: 100px;
     padding: 10px 0;
 
-    &:last-child {
-      @media (max-width: 480px) {
-        display: none;
-      }
-    }
-
     @media (max-width: 480px) {
       height: 70px;
     }
