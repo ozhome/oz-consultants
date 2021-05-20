@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://api-test.ozcandy.com.br',
+  baseURL: 'https://api-home.ozcandy.com.br',
 });
 
 api.interceptors.response.use(response => {
