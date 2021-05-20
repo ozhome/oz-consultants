@@ -1,8 +1,8 @@
 export default interface IStore {
   name: string;
   id: string;
-  cpf: string;
+  document: string;
   store: string;
-  type: 'go' | 'home';
+  type: 'oz_go' | 'oz_home';
   phone: string;
 }

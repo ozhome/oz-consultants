@@ -79,7 +79,7 @@ const Home: React.FC = () => {
                 <p>{user.city}</p>
               </div>
 
-              {user.type === 'go' ? (
+              {user.type === 'oz_go' ? (
                 <img src={go} alt="Oz GO" />
               ) : (
                 <img src={home} alt="Oz Home" />
