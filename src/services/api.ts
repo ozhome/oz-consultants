@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://api-home.ozcandy.com.br',
+  baseURL: process.env.REACT_APP_URL,
 });
 
 api.interceptors.response.use(response => {
