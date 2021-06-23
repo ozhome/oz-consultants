@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 
 import { useInventory } from '../../hooks/inventory';
@@ -29,26 +29,27 @@ interface ItemProps {
 }
 
 const ItemCart: React.FC<ItemProps> = ({ item, openModal }) => {
-  const { plusCart, minusCart } = useCart();
+  const { updateCart } = useCart();
   const { updateInventory } = useInventory();
 
-  const handlePlus = useCallback(() => {
-    if (item.quantity + 1 <= item.qty_available) {
-      const res = plusCart(item);
-      updateInventory(res);
-    }
-  }, [item, plusCart, updateInventory]);
+  const updateInputValue = (quantity: number, inputSet = false) => {
+    updateInventory({ ...item, quantity }, inputSet);
+    updateCart({ ...item, quantity }, inputSet);
+  };
 
-  const handleMinus = useCallback(() => {
-    if (item.quantity) {
-      const res = minusCart(item);
-      updateInventory(res);
-    }
-  }, [item, minusCart, updateInventory]);
+  const handlePlus = () => {
+    const quantity = item.to_weight ? 10 : 1;
+    updateInputValue(quantity);
+  };
 
-  const inputAdd = useCallback(() => {
+  const handleMinus = () => {
+    const quantity = item.to_weight ? -10 : -1;
+    updateInputValue(quantity);
+  };
+
+  const inputAdd = () => {
     if (openModal) openModal(item);
-  }, [item, openModal]);
+  };
 
   return (
     <Container>
