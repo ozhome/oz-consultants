@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import Category from '../../components/Category';
@@ -31,13 +31,10 @@ const Store: React.FC = () => {
     categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25),
   );
 
-  const handleCategory = useCallback(
-    async (id: number) => {
-      selectedCategory(id);
-      push('/items');
-    },
-    [push, selectedCategory],
-  );
+  const handleCategory = async (id: number) => {
+    selectedCategory(id);
+    push('/subcategories');
+  };
 
   useEffect(() => {
     const get = async () => {

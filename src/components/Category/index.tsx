@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { useInventory } from '../../hooks/inventory';
@@ -9,16 +9,27 @@ interface CategoryProps {
   image: string;
   name: string;
   id: number;
+  isCategory?: boolean;
 }
 
-const Category: React.FC<CategoryProps> = ({ image, name, id }) => {
+const Category: React.FC<CategoryProps> = ({
+  image,
+  name,
+  id,
+  isCategory = true,
+}) => {
   const { push } = useHistory();
-  const { selectedCategory } = useInventory();
+  const { selectedCategory, selectedSubcategory } = useInventory();
 
-  const handleCategory = useCallback(async () => {
-    selectedCategory(id);
-    push('/items');
-  }, [id, push, selectedCategory]);
+  const handleCategory = async () => {
+    if (isCategory) {
+      selectedCategory(id);
+      push('/subcategories');
+    } else {
+      selectedSubcategory(id);
+      push('/items');
+    }
+  };
 
   return (
     <Container onClick={handleCategory}>

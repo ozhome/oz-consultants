@@ -11,9 +11,7 @@ import IItem from '../DTOS/IItem';
 interface CartContextData {
   cart: IItem[];
   amount: number;
-  plusCart(item: IItem): IItem;
-  minusCart(item: IItem): IItem;
-  updateCart(item: IItem): void;
+  updateCart(item: IItem, insertInput?: boolean): void;
   clearCart(): void;
 }
 
@@ -23,76 +21,35 @@ const CartProvider: React.FC = ({ children }) => {
   const [cart, setCart] = useState<IItem[]>([]);
   const [amount, setAmount] = useState(0);
 
-  const plusCart = useCallback(
-    (item: IItem) => {
-      const index = cart.findIndex(product => product.id === item.id);
+  const updateCart = useCallback((item: IItem, insertInput = false) => {
+    setCart(state => {
+      const itemIndex = state.findIndex(product => product.id === item.id);
+      let { qty_available } = item;
+      let quantity = 0;
+      let sum = item.quantity;
 
-      let products: IItem[] = [];
-      if (index >= 0) {
-        products = cart.map(product => {
-          if (product.id === item.id) {
-            return {
-              ...product,
-              quantity: product.quantity + 1,
-            };
-          }
-          return product;
-        });
-      } else {
-        products = [...cart, { ...item, quantity: 1 }];
-      }
-
-      setCart(products);
-      return { ...item, quantity: item.quantity + 1 };
-    },
-    [cart],
-  );
-
-  const minusCart = useCallback(
-    (item: IItem) => {
-      const index = cart.findIndex(product => product.id === item.id);
-
-      if (index >= 0) {
-        const products = cart
-          .map(product => {
-            if (product.id === item.id) {
-              return {
-                ...product,
-                quantity: product.quantity - 1,
-              };
-            }
-            return product;
-          })
-          .filter(product => product.quantity > 0);
-
-        setCart(products);
-        return { ...item, quantity: item.quantity - 1 };
-      }
-      return item;
-    },
-    [cart],
-  );
-
-  const updateCart = useCallback(
-    (item: IItem) => {
-      const index = cart.findIndex(product => product.id === item.id);
-      if (index >= 0) {
-        setCart(state =>
-          state
-            .map(i => {
-              if (i.id === item.id) {
-                return item;
-              }
-              return i;
-            })
-            .filter(i => i.quantity > 0),
+      if (item.to_weight)
+        qty_available = parseFloat(
+          `${item.qty_available * 1000}`.replace(/\D/g, ''),
         );
-      } else if (item.quantity > 0) {
-        setCart(state => [...state, item]);
+
+      if (!insertInput) {
+        if (itemIndex >= 0) sum = state[itemIndex].quantity + item.quantity;
+        else sum = item.quantity;
       }
-    },
-    [cart],
-  );
+
+      if (sum > qty_available) quantity = qty_available;
+      else if (sum <= 0) quantity = 0;
+      else quantity = sum;
+
+      const items = state;
+
+      if (itemIndex >= 0) items[itemIndex].quantity = quantity;
+      else items.push({ ...item, quantity });
+
+      return items.filter(product => product.quantity > 0);
+    });
+  }, []);
 
   const clearCart = useCallback(() => {
     setCart([]);
@@ -113,8 +70,6 @@ const CartProvider: React.FC = ({ children }) => {
       value={{
         cart,
         amount,
-        plusCart,
-        minusCart,
         updateCart,
         clearCart,
       }}

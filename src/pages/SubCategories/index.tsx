@@ -1,61 +1,69 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import Category from '../../components/Category';
 import Header from '../../components/StoreHeader';
-import Item from '../../components/Item';
-import ModalInput from '../../components/ModalInput';
+import Modal from '../../components/Modal';
 import Cart from '../../components/Cart';
 
 import { useInventory } from '../../hooks/inventory';
-import { useAlert } from '../../hooks/alert';
+import { useCart } from '../../hooks/cart';
 
 import ICategory from '../../DTOS/ICategory';
-import IItem from '../../DTOS/IItem';
 
-import { Categories, Container, Content } from './styles';
+import { Container, Content } from './styles';
 
-const Items: React.FC = () => {
-  const { push } = useHistory();
+interface IRouteProps {
+  cpf: string;
+}
+
+const SubCategories: React.FC = () => {
   const {
     selectedSub,
     selectedCateg,
-    products,
     categories,
+    getInventory,
     selectedCategory,
     selectedSubcategory,
   } = useInventory();
-  const { addAlert } = useAlert();
+  const { push } = useHistory();
+  const { cart } = useCart();
+  const [modal, setModal] = useState(true);
 
   const [data, setData] = useState<ICategory[]>(
-    categories.filter(item => item.has_product),
+    categories.filter(
+      item => item.has_product && item.parent_id === selectedCateg,
+    ),
   );
-
-  const openModal = useCallback(
-    (item: IItem) => {
-      addAlert({
-        title: `Informe a quantidade`,
-        button: async () => {
-          /* TODO */
-        },
-        custom: ModalInput,
-        customProps: { visible: true, item },
-        hiddenButtons: true,
-      });
-    },
-    [addAlert],
-  );
-
-  const updateCateg = (id: number) => {
-    selectedCategory(id);
-    push('/subcategories');
-  };
 
   useEffect(() => {
-    setData(categories.filter(item => item.has_product));
-  }, [categories]);
+    const get = async () => {
+      try {
+        if (!selectedCateg) push('/');
+        await getInventory(cart);
+      } catch {
+        // TODO
+      } finally {
+        setModal(false);
+      }
+    };
+
+    setModal(true);
+    get();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCateg]);
+
+  useEffect(() => {
+    setData(
+      categories.filter(
+        item => item.has_product && item.parent_id === selectedCateg,
+      ),
+    );
+  }, [categories, selectedCateg]);
 
   return (
     <>
+      <Modal visible={modal} />
       <Cart />
       <Container>
         <Header back>
@@ -71,7 +79,7 @@ const Items: React.FC = () => {
                     }
                     key={item.id}
                     type="button"
-                    onClick={() => updateCateg(item.idOdoo)}
+                    onClick={() => selectedCategory(item.idOdoo)}
                   >
                     {item.name}
                   </button>
@@ -99,28 +107,20 @@ const Items: React.FC = () => {
         <Content>
           <h3>
             {data.length
-              ? 'Por favor selecione os produtos que deseja'
-              : 'Infelizmente não encontramos nenhum produto.\n' +
+              ? 'Por favor selecione uma categoria que deseja'
+              : 'Infelizmente não encontramos nenhum para essa categoria.\n' +
                 'Utilize o menu para voltar'}
           </h3>
-          <Categories>
-            {data.map(item => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => selectedSubcategory(item.idOdoo)}
-                className={item.idOdoo === selectedSub ? 'active' : 'inative'}
-              >
-                {item.name}
-              </button>
-            ))}
-          </Categories>
           <div>
-            {products
-              .filter(item => item.pos_categ_id === selectedSub)
-              .map(item => (
-                <Item key={item.id} item={item} openModal={openModal} />
-              ))}
+            {data.map(item => (
+              <Category
+                key={item.id}
+                image={item.image}
+                name={item.name}
+                id={item.idOdoo}
+                isCategory={false}
+              />
+            ))}
           </div>
         </Content>
       </Container>
@@ -128,4 +128,4 @@ const Items: React.FC = () => {
   );
 };
 
-export default Items;
+export default SubCategories;
