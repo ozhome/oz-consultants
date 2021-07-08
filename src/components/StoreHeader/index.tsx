@@ -11,10 +11,7 @@ import { useToast } from '../../hooks/toast';
 
 import Sidebar from '../Sidebar';
 
-import FormClient from '../FormClient';
 import ShowCart from '../ShowCart';
-
-import sendMessage from '../../utils/sendMessage';
 
 import go from '../../assets/images/oz-go.png';
 import home from '../../assets/images/oz-home.png';
@@ -32,7 +29,7 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
   const { clearInventory } = useInventory();
   const { addAlert } = useAlert();
   const { addToast } = useToast();
-  const { goBack } = useHistory();
+  const { goBack, push } = useHistory();
   const [sidebar, setSidebar] = useState(false);
 
   useEffect(() => {
@@ -47,13 +44,8 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
   }, [clearCart, clearInventory]);
 
   const openFinish = useCallback(() => {
-    addAlert({
-      title: 'Dados pessoais',
-      custom: FormClient,
-      button: sendMessage,
-      hiddenButtons: true,
-    });
-  }, [addAlert]);
+    push('payment');
+  }, [push]);
 
   const finish = useCallback(() => {
     if (cart.length) openFinish();

@@ -1,33 +1,27 @@
 import React, { useCallback } from 'react';
 import { FiShoppingBag } from 'react-icons/fi';
+import { useHistory } from 'react-router-dom';
 
 import IAlertResult from '../../DTOS/IAlertResult';
 import { useAlert } from '../../hooks/alert';
 import { useCart } from '../../hooks/cart';
 
 import FormatReal from '../../utils/formatReal';
-import sendMessage from '../../utils/sendMessage';
 
 import ShowCart from '../ShowCart';
-import FormClient from '../FormClient';
 
 import { Container, Content, Text } from './styles';
 
 const Cart: React.FC = () => {
   const { amount, cart } = useCart();
   const { addAlert } = useAlert();
+  const { push } = useHistory();
 
   const finish = useCallback(
     async (data: IAlertResult<null>) => {
-      if (data.result === 'success' && cart.length)
-        addAlert({
-          title: 'Dados pessoais',
-          custom: FormClient,
-          hiddenButtons: true,
-          button: sendMessage,
-        });
+      if (data.result === 'success' && cart.length) push('payment');
     },
-    [addAlert, cart.length],
+    [cart.length, push],
   );
 
   const handleCart = useCallback(() => {
