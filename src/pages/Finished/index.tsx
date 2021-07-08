@@ -221,16 +221,31 @@ const Finished: React.FC = () => {
                 <Input
                   className="input"
                   name="card_month"
+                  type="number"
                   icon={FiCreditCard}
                   placeholder="MM"
+                  min={1}
+                  max={12}
+                  step={1}
                 />
-                <Input className="input" name="card_year" placeholder="YY" />
+                <Input
+                  className="input"
+                  type="number"
+                  name="card_year"
+                  placeholder="YY"
+                  min={21}
+                  max={99}
+                  step={1}
+                />
               </div>
               <Input
                 name="card_cvv"
                 icon={FiCreditCard}
                 placeholder="CVV"
-                maxLength={4}
+                type="number"
+                min={0}
+                max={999}
+                step={1}
               />
 
               {!hiddenButton && <Button type="submit">Finalziar pedido</Button>}
