@@ -1,7 +1,12 @@
 export default interface IParamsClient {
   name: string;
-  email: string;
   phone: string;
+  email: string;
   cpf: string;
-  address: string;
+  state: string;
+  city: string;
+  neighborhood: string;
+  street: string;
+  street_number: string;
+  zipcode: string;
 }

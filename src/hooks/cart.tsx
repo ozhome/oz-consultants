@@ -5,12 +5,16 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import Dinero from 'dinero.js';
 
 import IItem from '../DTOS/IItem';
+import IParamsOrder from '../DTOS/IParamsOrder';
 
 interface CartContextData {
   cart: IItem[];
   amount: number;
+  user: IParamsOrder;
+  updateUser(user: IParamsOrder): void;
   updateCart(item: IItem, insertInput?: boolean): void;
   clearCart(): void;
 }
@@ -19,6 +23,7 @@ const CartContext = createContext<CartContextData>({} as CartContextData);
 
 const CartProvider: React.FC = ({ children }) => {
   const [cart, setCart] = useState<IItem[]>([]);
+  const [user, setUser] = useState<IParamsOrder>({} as IParamsOrder);
   const [amount, setAmount] = useState(0);
 
   const updateCart = useCallback((item: IItem, insertInput = false) => {
@@ -56,19 +61,28 @@ const CartProvider: React.FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const value = cart.reduce((acc, cur) => {
-      if (cur.to_weight) {
-        return acc + cur.price * (cur.quantity / 1000);
-      }
-      return acc + cur.price * cur.quantity;
-    }, 0);
-    setAmount(parseFloat(value.toFixed(2)));
+    let price = Dinero({ amount: 0 });
+
+    cart.forEach(value => {
+      const itemPrice = parseFloat(value.price.toFixed(2).replace(/\D/g, ''));
+      const item = Dinero({
+        amount: itemPrice,
+      })
+        .multiply(value.to_weight ? value.quantity / 1000 : value.quantity)
+        .percentage(100 - (value.discount || 0));
+
+      price = price.add(item);
+    });
+
+    setAmount(price.getAmount() / 100);
   }, [cart]);
 
   return (
     <CartContext.Provider
       value={{
         cart,
+        user,
+        updateUser: setUser,
         amount,
         updateCart,
         clearCart,
