@@ -6,6 +6,7 @@ import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
+import { validate } from 'gerador-validador-cpf';
 
 import Header from '../../components/StoreHeader';
 import Input from '../../components/Input';
@@ -79,6 +80,15 @@ const Payment: React.FC = () => {
         await schema.validate(data, {
           abortEarly: false,
         });
+
+        if (!validate(data.cpf)) {
+          addToast({
+            title: 'CPF inválido',
+            description: 'Digite um CPF válido',
+            type: 'error',
+          });
+          return;
+        }
 
         if (!type) throw new Error();
 
@@ -277,13 +287,6 @@ const Payment: React.FC = () => {
               onClick={() => updatePayment('pix')}
             >
               Pix
-            </Button>
-            <Button
-              type="button"
-              className={type === 'cash' ? 'select' : 'unselect'}
-              onClick={() => updatePayment('cash')}
-            >
-              Dinheiro
             </Button>
           </Section>
 
