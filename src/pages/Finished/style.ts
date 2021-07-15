@@ -6,7 +6,7 @@ export const Container = styled.div`
 `;
 
 interface IModal {
-  loading: boolean;
+  display: string;
 }
 
 export const Modal = styled.div<IModal>`
@@ -17,7 +17,7 @@ export const Modal = styled.div<IModal>`
   left: 0;
   z-index: 10;
 
-  display: ${props => (props.loading ? 'block' : 'none')};
+  display: ${props => props.display};
 
   .content {
     width: 100%;

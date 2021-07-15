@@ -16,8 +16,10 @@ import IParamsOrder, { ICard } from '../../DTOS/IParamsOrder';
 import { useInventory } from '../../hooks/inventory';
 import { useToast } from '../../hooks/toast';
 import { useCart } from '../../hooks/cart';
+import { useStore } from '../../hooks/store';
 
 import getValidationErrors from '../../utils/getValidationErrors';
+import formatReal from '../../utils/formatReal';
 
 import { Container, Modal, Content, Section, ContainerQRCoe } from './style';
 import api from '../../services/api';
@@ -35,6 +37,7 @@ interface IFinished {
 const Finished: React.FC = () => {
   const infoForm = useRef<FormHandles>(null);
   const { categories, selectedCategory } = useInventory();
+  const { store } = useStore();
   const { user } = useCart();
   const { push } = useHistory();
   const { addToast } = useToast();
@@ -48,6 +51,44 @@ const Finished: React.FC = () => {
     selectedCategory(id);
     push('/subcategories');
   };
+
+  const sendWhats = useCallback(() => {
+    const hello = `Olá, *${store.name}*!`;
+    const describe = `Acabei de visitar seu catálogo e realizei o seguinte pedido:`;
+
+    const list = user.products.reduce((acc: string, cur) => {
+      const product = `*${cur.qty}${cur.to_weight ? 'g ' : ''}x* - ${
+        cur.name
+      };`;
+
+      const price = `${formatReal(cur.price)} - ${
+        cur.to_weight ? 'por kg' : 'a unidade.'
+      }`;
+
+      return `${acc}${product}\n${price}`;
+    }, '');
+
+    const amountText = `*Total: ${formatReal(user.amount / 100)}*`;
+
+    const { client } = user;
+
+    const infos = `Segue meus dados para a compra:
+Nome: ${client.name}
+Telefone: ${client.phone}
+E-mail: ${client.email}
+CPF: ${client.cpf}
+Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${client.city}, ${client.state} - ${client.zipcode}`;
+
+    const finish = `Aguardo sua confirmação.`;
+
+    const text = encodeURI(
+      `${hello} ${describe}\n\n${list}\n${amountText}\n\n${infos}\n\n${finish}`,
+    );
+
+    window.open(
+      `https://api.whatsapp.com/send?phone=${store.phone}&text=${text}`,
+    );
+  }, [store.name, store.phone, user]);
 
   const sendOrder = useCallback(
     async (data: IParamsOrder) => {
@@ -163,42 +204,11 @@ const Finished: React.FC = () => {
     finished,
   ]);
 
-  return (
-    <Container>
-      <Modal loading={finished.loading}>
-        <div className="content">
-          <ReactLoading
-            type="bubbles"
-            color="#f9a72b"
-            height="50%"
-            width="20%"
-          />
-        </div>
-      </Modal>
-      <Header back>
-        <section>
-          <h3>Categorias</h3>
-          <div>
-            {categories
-              .filter(item => !item.parent_id && item.idOdoo !== 25)
-              .map(item => (
-                <button
-                  className="inative"
-                  key={item.id}
-                  type="button"
-                  onClick={() => updateCateg(item.idOdoo)}
-                >
-                  {item.name}
-                </button>
-              ))}
-          </div>
-        </section>
-        <hr />
-      </Header>
-      <hr />
-      <Content>
-        <h2>Informações para pagamento</h2>
-        {user.payment_type === 'credit' ? (
+  const formFinished = useMemo(() => {
+    if (user.payment_type === 'credit')
+      return (
+        <>
+          <h2>Informações para pagamento</h2>
           <Form ref={infoForm} onSubmit={handleSubmit}>
             <Section>
               <h3>Informações do cartão</h3>
@@ -251,46 +261,98 @@ const Finished: React.FC = () => {
               {!hiddenButton && <Button type="submit">Finalziar pedido</Button>}
             </Section>
           </Form>
-        ) : (
+        </>
+      );
+    return (
+      <Section>
+        <h2>Informações para pagamento</h2>
+        <h3>Avisos</h3>
+        <div>
+          <p>
+            O pedido será enviado para o consultor, ele irá aguardar a
+            confirmação do pagamento via Pix e irá entrar em contato.
+          </p>
+          <br />
+          <p>Será gerado um QR Code e a opção de Copiar</p>
+          <br />
+          <p>
+            Caso perca o QR Code, entre em contato com o Consultor para mais
+            informações.
+          </p>
+        </div>
+        <br />
+        {!hiddenButton && (
+          <Button type="button" onClick={() => sendOrder(user)}>
+            Finalziar pedido
+          </Button>
+        )}
+      </Section>
+    );
+  }, [handleSubmit, hiddenButton, sendOrder, user]);
+
+  return (
+    <Container>
+      <Modal display={finished.loading ? 'block' : 'none'}>
+        <div className="content">
+          <ReactLoading
+            type="bubbles"
+            color="#f9a72b"
+            height="50%"
+            width="20%"
+          />
+        </div>
+      </Modal>
+      <Header back>
+        <section>
+          <h3>Categorias</h3>
+          <div>
+            {categories
+              .filter(item => !item.parent_id && item.idOdoo !== 25)
+              .map(item => (
+                <button
+                  className="inative"
+                  key={item.id}
+                  type="button"
+                  onClick={() => updateCateg(item.idOdoo)}
+                >
+                  {item.name}
+                </button>
+              ))}
+          </div>
+        </section>
+        <hr />
+      </Header>
+      <hr />
+      <Content>
+        {finished.finished ? (
           <Section>
-            <h3>Avisos</h3>
-            {user.payment_type === 'cash' ? (
-              <div>
-                <p>
-                  O pedido será enviado para o consultor, ele irá entrar em
-                  contato para finalizar o pagamento.
-                </p>
-              </div>
-            ) : (
-              <div>
-                <p>
-                  O pedido será enviado para o consultor, ele irá aguardar a
-                  confirmação do pagamento via Pix e irá entrar em contato.
-                </p>
-                <br />
-                <p>Será gerado um QR Code e a opção de Copiar</p>
-                <br />
-                <p>
-                  Caso perca o QR Code, entre em contato com o Consultor para
-                  mais informações.
-                </p>
-                {!!pix && (
-                  <ContainerQRCoe>
-                    <QRCode value="hey" />
-                    <Button type="button" onClick={copyPix}>
-                      Copiar Pix
-                    </Button>
-                  </ContainerQRCoe>
-                )}
-              </div>
-            )}
-            <br />
-            {!hiddenButton && (
-              <Button type="button" onClick={() => sendOrder(user)}>
-                Finalziar pedido
+            <h3>Confirmação do pedido</h3>
+            <div>
+              <p>O pedido foi enviado para o consultor.</p>
+              <br />
+              <p>Vamos confirmar o pedido no Whatsapp?</p>
+
+              {!!pix && (
+                <ContainerQRCoe>
+                  <p>
+                    Caso perca o QR Code, entre em contato com o Consultor para
+                    recuperar.
+                  </p>
+                  <br />
+                  <QRCode value="hey" />
+                  <Button type="button" onClick={copyPix}>
+                    Copiar Pix
+                  </Button>
+                </ContainerQRCoe>
+              )}
+
+              <Button type="button" onClick={sendWhats}>
+                Confirmar pedido no Whatsapp
               </Button>
-            )}
+            </div>
           </Section>
+        ) : (
+          formFinished
         )}
       </Content>
     </Container>
