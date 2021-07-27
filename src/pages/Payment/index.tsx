@@ -240,13 +240,12 @@ const Payment: React.FC = () => {
               name="street"
               icon={FiHome}
               placeholder="Rua"
-              readOnly
-              value={
+              defaultValue={
                 typeof address.street === 'undefined' ? '' : address.street
               }
             />
             <Input
-              value={
+              defaultValue={
                 typeof address.neighborhood === 'undefined'
                   ? ''
                   : address.neighborhood
@@ -254,21 +253,22 @@ const Payment: React.FC = () => {
               name="neighborhood"
               icon={FiHome}
               placeholder="Bairro"
-              readOnly
             />
             <Input
               name="city"
               icon={FiHome}
               placeholder="Cidade"
-              readOnly
-              value={typeof address.city === 'undefined' ? '' : address.city}
+              defaultValue={
+                typeof address.city === 'undefined' ? '' : address.city
+              }
             />
             <Input
               name="state"
               icon={FiHome}
-              placeholder="Estato"
-              readOnly
-              value={typeof address.state === 'undefined' ? '' : address.state}
+              placeholder="Estado"
+              defaultValue={
+                typeof address.state === 'undefined' ? '' : address.state
+              }
             />
           </Section>
 
@@ -279,7 +279,7 @@ const Payment: React.FC = () => {
               className={type === 'credit' ? 'select' : 'unselect'}
               onClick={() => updatePayment('credit')}
             >
-              Cartão de crétido
+              Cartão de crédito
             </Button>
             <Button
               type="button"
