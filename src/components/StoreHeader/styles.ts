@@ -14,6 +14,11 @@ export const Container = styled.header`
   padding: 0 4rem;
   margin-bottom: 20px;
 
+  .image {
+    background: none;
+    border: none;
+  }
+
   img {
     object-fit: contain;
     height: 130px;
@@ -42,5 +47,9 @@ export const Menu = styled.button`
 
   & + button {
     left: 64px;
+  }
+
+  & + button + button {
+    left: 112px;
   }
 `;

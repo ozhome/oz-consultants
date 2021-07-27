@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
-import { RiArrowGoBackFill } from 'react-icons/ri';
+import { RiArrowGoBackFill, RiHome2Line } from 'react-icons/ri';
 import { useHistory } from 'react-router-dom';
 
 import { useStore } from '../../hooks/store';
@@ -29,7 +29,7 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
   const { clearInventory } = useInventory();
   const { addAlert } = useAlert();
   const { addToast } = useToast();
-  const { goBack, push } = useHistory();
+  const { goBack, push, replace } = useHistory();
   const [sidebar, setSidebar] = useState(false);
 
   useEffect(() => {
@@ -63,6 +63,10 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
     [openFinish],
   );
 
+  const goHome = useCallback(() => {
+    if (back) replace(`/store/${store.document.replace(/\D/g, '')}`);
+  }, [back, replace, store.document]);
+
   const showCart = useCallback(() => {
     if (cart.length)
       addAlert({
@@ -80,11 +84,13 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
 
   return (
     <Container>
-      {store.type === 'oz_go' ? (
-        <img src={go} alt="Oz GO" />
-      ) : (
-        <img src={home} alt="Oz Home" />
-      )}
+      <button className="image" type="button" onClick={goHome}>
+        {store.type === 'oz_go' ? (
+          <img src={go} alt="Oz GO" />
+        ) : (
+          <img src={home} alt="Oz Home" />
+        )}
+      </button>
       <h1>{`Bem vindo a loja ${store.name}`}</h1>
       <p>Coloque os produtos que deseja na sacola e depois finalize a compra</p>
 
@@ -92,9 +98,14 @@ const StoreHeader: React.FC<IProps> = ({ children, back }) => {
         <FiMenu size={20} />
       </Menu>
       {back && (
-        <Menu type="button" onClick={goBack}>
-          <RiArrowGoBackFill size={20} />
-        </Menu>
+        <>
+          <Menu type="button" onClick={goBack}>
+            <RiArrowGoBackFill size={20} />
+          </Menu>
+          <Menu type="button" onClick={goHome}>
+            <RiHome2Line size={20} />
+          </Menu>
+        </>
       )}
       <Sidebar name={store.name} show={sidebar} close={() => setSidebar(false)}>
         {children}
