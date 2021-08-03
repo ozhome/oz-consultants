@@ -283,7 +283,7 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
         <br />
         {!hiddenButton && (
           <Button type="button" onClick={() => sendOrder(user)}>
-            Finalziar pedido
+            Finalizar pedido
           </Button>
         )}
       </Section>
