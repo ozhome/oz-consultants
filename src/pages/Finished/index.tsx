@@ -38,7 +38,7 @@ const Finished: React.FC = () => {
   const infoForm = useRef<FormHandles>(null);
   const { categories, selectedCategory } = useInventory();
   const { store } = useStore();
-  const { user } = useCart();
+  const { user, clearCart } = useCart();
   const { push } = useHistory();
   const { addToast } = useToast();
   const [pix, setPix] = useState('');
@@ -88,7 +88,10 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
     window.open(
       `https://api.whatsapp.com/send?phone=${store.phone}&text=${text}`,
     );
-  }, [store.name, store.phone, user]);
+
+    clearCart();
+    push(`store/${store.document.replace(/\D/g, '')}`);
+  }, [clearCart, push, store.document, store.name, store.phone, user]);
 
   const sendOrder = useCallback(
     async (data: IParamsOrder) => {
