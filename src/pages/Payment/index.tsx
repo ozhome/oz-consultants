@@ -232,7 +232,11 @@ const Payment: React.FC = () => {
               name="zipcode"
               icon={FiHome}
               placeholder="CEP"
-              onChange={e => updateZipCode(e.target.value)}
+              onChange={e => {
+                updateZipCode(e.target.value);
+                e.target.value = e.target.value.replace(/\D/g, '');
+              }}
+              minLength={8}
               maxLength={8}
             />
             <Input name="street_number" icon={FiHome} placeholder="Número" />
