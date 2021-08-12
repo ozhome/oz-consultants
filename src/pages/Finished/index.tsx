@@ -261,7 +261,7 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
                 step={1}
               />
 
-              {!hiddenButton && <Button type="submit">Finalziar pedido</Button>}
+              {!hiddenButton && <Button type="submit">Finalizar pedido</Button>}
             </Section>
           </Form>
         </>
@@ -342,7 +342,7 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
                     recuperar.
                   </p>
                   <br />
-                  <QRCode value="hey" />
+                  <QRCode value={pix} />
                   <Button type="button" onClick={copyPix}>
                     Copiar Pix
                   </Button>

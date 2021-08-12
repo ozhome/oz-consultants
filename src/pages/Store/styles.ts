@@ -35,8 +35,8 @@ export const Content = styled.div`
     }
 
     @media (max-width: 460px) {
-      grid-template-columns: 200px;
-      grid-template-rows: 250px;
+      grid-template-columns: 150px 150px;
+      grid-template-rows: 200px;
     }
   }
 
