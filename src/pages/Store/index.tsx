@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
 import Category from '../../components/Category';
@@ -24,17 +24,30 @@ const Store: React.FC = () => {
 
   const { findStore, store } = useStore();
   const { addToast } = useToast();
-  const { categories, getCategories, selectedCategory } = useInventory();
+  const {
+    categories,
+    getCategories,
+    selectedCategory,
+    selectedSubcategory,
+    getExternalConsultant,
+  } = useInventory();
 
   const [modal, setModal] = useState(true);
   const [data, setData] = useState<ICategory[]>(
     categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25),
   );
 
-  const handleCategory = async (id: number) => {
-    selectedCategory(id);
-    push('/subcategories');
-  };
+  const handleCategory = useCallback(
+    async (id: number) => {
+      if (store.is_external_consultant) {
+        selectedSubcategory(id);
+      } else {
+        selectedCategory(id);
+        push('/subcategories');
+      }
+    },
+    [push, selectedCategory, selectedSubcategory, store.is_external_consultant],
+  );
 
   useEffect(() => {
     const get = async () => {
@@ -42,19 +55,25 @@ const Store: React.FC = () => {
         setModal(false);
         return;
       }
+      let is_external = false;
       try {
-        await findStore(cpf);
+        is_external = await findStore(cpf);
       } catch {
         addToast({
           title: 'Consultor não encontrado',
           type: 'error',
         });
         push('/');
+        return;
       } finally {
         setModal(false);
       }
       try {
-        await getCategories();
+        if (is_external) {
+          await getExternalConsultant();
+        } else {
+          await getCategories();
+        }
       } catch {
         addToast({
           title: 'Erro inesperado',
@@ -69,8 +88,9 @@ const Store: React.FC = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    setData(categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25));
-  }, [categories]);
+    if (store.is_external_consultant) setData(categories);
+    else setData(categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25));
+  }, [categories, store.is_external_consultant]);
 
   return (
     <>
@@ -103,6 +123,7 @@ const Store: React.FC = () => {
                 image={item.image}
                 name={item.name}
                 id={item.idOdoo}
+                isCategory={!store.is_external_consultant}
               />
             ))}
           </div>

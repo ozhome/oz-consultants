@@ -4,7 +4,7 @@ import api from '../services/api';
 
 interface IStoreContextData {
   store: IStore;
-  findStore(cpf: string): Promise<void>;
+  findStore(cpf: string): Promise<boolean>;
 }
 
 const StoreContext = createContext<IStoreContextData>({} as IStoreContextData);
@@ -12,10 +12,11 @@ const StoreContext = createContext<IStoreContextData>({} as IStoreContextData);
 const StoreProvider: React.FC = ({ children }) => {
   const [store, setStore] = useState<IStore>({} as IStore);
 
-  const findStore = useCallback(async (cpf: string) => {
+  const findStore = useCallback(async (cpf: string): Promise<boolean> => {
     const { data } = await api.get(`/users/consultants/document/${cpf}`);
     api.defaults.headers.ErpID = data.store;
     setStore(data);
+    return data.is_external_consultant;
   }, []);
 
   return (

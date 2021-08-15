@@ -13,9 +13,11 @@ import ICategory from '../../DTOS/ICategory';
 import IItem from '../../DTOS/IItem';
 
 import { Categories, Container, Content } from './styles';
+import { useStore } from '../../hooks/store';
 
 const Items: React.FC = () => {
   const { push } = useHistory();
+  const { store } = useStore();
   const {
     selectedSub,
     selectedCateg,
@@ -79,21 +81,25 @@ const Items: React.FC = () => {
             </div>
           </section>
           <hr />
-          <section>
-            <h3>Subcategorias</h3>
-            <div>
-              {data.map(item => (
-                <button
-                  className={item.idOdoo === selectedSub ? 'active' : 'inative'}
-                  key={item.id}
-                  type="button"
-                  onClick={() => selectedSubcategory(item.idOdoo)}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          </section>
+          {!store.is_external_consultant && (
+            <section>
+              <h3>Subcategorias</h3>
+              <div>
+                {data.map(item => (
+                  <button
+                    className={
+                      item.idOdoo === selectedSub ? 'active' : 'inative'
+                    }
+                    key={item.id}
+                    type="button"
+                    onClick={() => selectedSubcategory(item.idOdoo)}
+                  >
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
         </Header>
         <hr />
         <Content>

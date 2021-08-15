@@ -9,6 +9,7 @@ export default interface IStore {
   street_number: string;
   complementary: string;
   neighborhood: string;
+  is_external_consultant: boolean;
   city: string;
   state: string;
   zipcode: string;
