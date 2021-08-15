@@ -67,9 +67,7 @@ const CartProvider: React.FC = ({ children }) => {
       const itemPrice = parseFloat(value.price.toFixed(2).replace(/\D/g, ''));
       const item = Dinero({
         amount: itemPrice,
-      })
-        .multiply(value.to_weight ? value.quantity / 1000 : value.quantity)
-        .percentage(100 - (value.discount || 0));
+      }).multiply(value.to_weight ? value.quantity / 1000 : value.quantity);
 
       price = price.add(item);
     });

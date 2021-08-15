@@ -14,6 +14,7 @@ interface InventoryContextData {
   selectedCategory(id: number): void;
   selectedSubcategory(id: number): void;
   updateInventory(item: IItem, insertInput?: boolean): void;
+  getExternalConsultant(): Promise<void>;
   clearInventory(): void;
 }
 
@@ -32,16 +33,9 @@ const InventoryProvider: React.FC = ({ children }) => {
     setCategories(data);
   }, []);
 
-  const getInventory = useCallback(
-    async (items: IItem[]) => {
-      const categoriesWithProdu = categories
-        .filter(ct => ct.parent_id === selectedCateg)
-        .map(ct => ct.id);
-      const { data } = await api.post('/products/', {
-        categories: categoriesWithProdu,
-      });
-
-      const categoriesChildren = categories.map(category => {
+  const setIventory = useCallback(
+    (data: IItem[], currentCategories: ICategory[], items?: IItem[]) => {
+      const categoriesChildren = currentCategories.map(category => {
         if (
           data.findIndex(
             (product: IItem) => product.pos_categ_id === category.idOdoo,
@@ -56,7 +50,7 @@ const InventoryProvider: React.FC = ({ children }) => {
       setSelectedSub(sub?.idOdoo || 0);
 
       const productsUpdate = data.map((product: IItem) => {
-        const item = items.find(i => i.id === product.id);
+        const item = items?.find(i => i.id === product.id);
         if (item) {
           return item;
         }
@@ -67,7 +61,21 @@ const InventoryProvider: React.FC = ({ children }) => {
       setCategories(categoriesChildren);
       setProducts(productsUpdate);
     },
-    [categories, selectedCateg],
+    [],
+  );
+
+  const getInventory = useCallback(
+    async (items: IItem[]) => {
+      const categoriesWithProdu = categories
+        .filter(ct => ct.parent_id === selectedCateg)
+        .map(ct => ct.id);
+      const { data } = await api.post('/products/', {
+        categories: categoriesWithProdu,
+      });
+
+      setIventory(data, categories, items);
+    },
+    [categories, selectedCateg, setIventory],
   );
 
   const selectedSubcategory = useCallback((id: number) => {
@@ -113,6 +121,12 @@ const InventoryProvider: React.FC = ({ children }) => {
     );
   }, []);
 
+  const getExternalConsultant = useCallback(async () => {
+    const { data } = await api.get('/products/external');
+    setCategories(data.categories);
+    setIventory(data.products, data.categories);
+  }, [setIventory]);
+
   const clearInventory = useCallback(() => {
     const productsUpdate = products.map(product => ({
       ...product,
@@ -129,6 +143,7 @@ const InventoryProvider: React.FC = ({ children }) => {
         selectedCateg,
         selectedSub,
         getInventory,
+        getExternalConsultant,
         getCategories,
         selectedCategory,
         selectedSubcategory,

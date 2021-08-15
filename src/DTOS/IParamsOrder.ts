@@ -28,5 +28,6 @@ export default interface IParamsOrder {
     qty: number;
     name: string;
     to_weight: boolean;
+    discount?: number;
   }[];
 }
