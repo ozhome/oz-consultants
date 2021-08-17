@@ -12,6 +12,7 @@ import { useCart } from '../../hooks/cart';
 import ICategory from '../../DTOS/ICategory';
 
 import { Container, Content } from './styles';
+import { useStore } from '../../hooks/store';
 
 interface IRouteProps {
   cpf: string;
@@ -27,6 +28,7 @@ const SubCategories: React.FC = () => {
     selectedSubcategory,
   } = useInventory();
   const { push } = useHistory();
+  const { store } = useStore();
   const { cart } = useCart();
   const [modal, setModal] = useState(true);
 
@@ -40,7 +42,7 @@ const SubCategories: React.FC = () => {
     const get = async () => {
       try {
         if (!selectedCateg) push('/');
-        await getInventory(cart);
+        if (!store.is_external_consultant) await getInventory(cart);
       } catch {
         // TODO
       } finally {
@@ -51,7 +53,7 @@ const SubCategories: React.FC = () => {
     setModal(true);
     get();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCateg]);
+  }, [selectedCateg, store.is_external_consultant]);
 
   useEffect(() => {
     setData(

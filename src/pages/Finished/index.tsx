@@ -23,6 +23,7 @@ import formatReal from '../../utils/formatReal';
 
 import { Container, Modal, Content, Section, ContainerQRCoe } from './style';
 import api from '../../services/api';
+import paymentType from '../../utils/paymentType';
 
 type IFormCard = Omit<ICard, 'card_expiration_date'> & {
   card_month: number;
@@ -76,8 +77,10 @@ const Finished: React.FC = () => {
 Nome: ${client.name}
 Telefone: ${client.phone}
 E-mail: ${client.email}
-CPF: ${client.cpf}
-Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${client.city}, ${client.state} - ${client.zipcode}`;
+Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
+      client.city
+    }, ${client.state} - ${client.zipcode}
+Forma de pagamento: ${paymentType(user.payment_type)}`;
 
     const finish = `Aguardo sua confirmação.`;
 
@@ -220,6 +223,10 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
                 contato para a entrega
               </p>
               <br />
+              <p>
+                Por favor, confirme o pedido via Whatsapp ao final da compra.
+              </p>
+              <br />
               <Input
                 name="card_number"
                 icon={FiCreditCard}
@@ -266,6 +273,29 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
           </Form>
         </>
       );
+
+    if (user.payment_type === 'boleto')
+      return (
+        <Section>
+          <h2>Informações para pagamento</h2>
+          <h3>Avisos</h3>
+          <div>
+            <p>
+              O pedido será enviado para o consultor, ele irá entrar em contato
+              para enviar o boleto
+            </p>
+            <br />
+            <p>Por favor, confirme o pedido via Whatsapp ao final da compra.</p>
+            <br />
+          </div>
+          <br />
+          {!hiddenButton && (
+            <Button type="button" onClick={() => sendOrder(user)}>
+              Finalizar pedido
+            </Button>
+          )}
+        </Section>
+      );
     return (
       <Section>
         <h2>Informações para pagamento</h2>
@@ -275,6 +305,8 @@ Endereço: ${client.street}, ${client.street_number}, ${client.neighborhood}, ${
             O pedido será enviado para o consultor, ele irá aguardar a
             confirmação do pagamento via Pix e irá entrar em contato.
           </p>
+          <br />
+          <p>Por favor, confirme o pedido via Whatsapp ao final da compra.</p>
           <br />
           <p>Será gerado um QR Code e a opção de Copiar</p>
           <br />

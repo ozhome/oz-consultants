@@ -28,9 +28,7 @@ const Items: React.FC = () => {
   } = useInventory();
   const { addAlert } = useAlert();
 
-  const [data, setData] = useState<ICategory[]>(
-    categories.filter(item => item.has_product),
-  );
+  const [data, setData] = useState<ICategory[]>([]);
 
   const openModal = useCallback(
     (item: IItem) => {
@@ -53,8 +51,12 @@ const Items: React.FC = () => {
   };
 
   useEffect(() => {
-    setData(categories.filter(item => item.has_product));
-  }, [categories]);
+    if (store.is_external_consultant) {
+      setData(categories.filter(item => item.parent_id === selectedCateg));
+    } else {
+      setData(categories.filter(item => item.has_product));
+    }
+  }, [categories, selectedCateg, store.is_external_consultant]);
 
   return (
     <>
@@ -81,25 +83,21 @@ const Items: React.FC = () => {
             </div>
           </section>
           <hr />
-          {!store.is_external_consultant && (
-            <section>
-              <h3>Subcategorias</h3>
-              <div>
-                {data.map(item => (
-                  <button
-                    className={
-                      item.idOdoo === selectedSub ? 'active' : 'inative'
-                    }
-                    key={item.id}
-                    type="button"
-                    onClick={() => selectedSubcategory(item.idOdoo)}
-                  >
-                    {item.name}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
+          <section>
+            <h3>Subcategorias</h3>
+            <div>
+              {data.map(item => (
+                <button
+                  className={item.idOdoo === selectedSub ? 'active' : 'inative'}
+                  key={item.id}
+                  type="button"
+                  onClick={() => selectedSubcategory(item.idOdoo)}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+          </section>
         </Header>
         <hr />
         <Content>
