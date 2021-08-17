@@ -88,9 +88,8 @@ const Store: React.FC = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (store.is_external_consultant) setData(categories);
-    else setData(categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25));
-  }, [categories, store.is_external_consultant]);
+    setData(categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25));
+  }, [categories]);
 
   return (
     <>
@@ -123,7 +122,6 @@ const Store: React.FC = () => {
                 image={item.image}
                 name={item.name}
                 id={item.idOdoo}
-                isCategory={!store.is_external_consultant}
               />
             ))}
           </div>

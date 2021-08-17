@@ -18,7 +18,7 @@ import { useToast } from '../../hooks/toast';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 import phoneMask from '../../utils/phoneMask';
-import cpfMask from '../../utils/cpfMask';
+import formatDocument from '../../utils/formatDocument';
 
 import IParamsClient from '../../DTOS/IParamsClient';
 
@@ -68,7 +68,7 @@ const Payment: React.FC = () => {
             .email('Digite um e-mail válido')
             .required('E-mail obrigatório'),
           phone: Yup.string().required('Telefone obrigatório').min(14).max(16),
-          cpf: Yup.string().required('CPF obrigatório'),
+          document: Yup.string().required('CPF/CNPJ obrigatório'),
           zipcode: Yup.string().length(8).required('CEP obrigatório'),
           street_number: Yup.string().required('Informe um número válido'),
           street: Yup.string().required('Informe um endereço válido'),
@@ -81,7 +81,7 @@ const Payment: React.FC = () => {
           abortEarly: false,
         });
 
-        if (!validate(data.cpf)) {
+        if (data.document.length <= 14 && !validate(data.document)) {
           addToast({
             title: 'CPF inválido',
             description: 'Digite um CPF válido',
@@ -219,13 +219,22 @@ const Payment: React.FC = () => {
               }}
             />
             <Input
-              name="cpf"
+              name="document"
               icon={BiUserPin}
-              placeholder="CPF"
+              placeholder="CPF/CNPJ"
+              maxLength={18}
+              minLength={14}
               onChange={e => {
-                e.target.value = cpfMask(e.target.value);
+                e.target.value = formatDocument(e.target.value);
               }}
             />
+            {store.is_external_consultant && (
+              <Input
+                name="document_company"
+                icon={BiUserPin}
+                placeholder="Inscrição estadual"
+              />
+            )}
           </Section>
           <Section>
             <h3>Endereço de cobrança</h3>
@@ -293,6 +302,15 @@ const Payment: React.FC = () => {
             >
               Pix
             </Button>
+            {store.is_external_consultant && (
+              <Button
+                type="button"
+                className={type === 'boleto' ? 'select' : 'unselect'}
+                onClick={() => updatePayment('boleto')}
+              >
+                Boleto
+              </Button>
+            )}
           </Section>
 
           <br />

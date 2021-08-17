@@ -12,7 +12,8 @@ export default interface IParamsOrder {
     name: string;
     phone: string;
     email: string;
-    cpf: string;
+    document: string;
+    document_company?: string;
     state: string;
     city: string;
     neighborhood: string;
