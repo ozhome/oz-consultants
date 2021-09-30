@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 
 import { useInventory } from '../../hooks/inventory';
@@ -32,7 +32,6 @@ interface ItemProps {
 const Item: React.FC<ItemProps> = ({ item, openModal }) => {
   const { updateCart } = useCart();
   const { updateInventory } = useInventory();
-  const maxCharacters = item.name.length > 40 ? 60 : 95;
 
   const updateInputValue = (quantity: number, inputSet = false) => {
     updateInventory({ ...item, quantity }, inputSet);
@@ -53,6 +52,14 @@ const Item: React.FC<ItemProps> = ({ item, openModal }) => {
     if (openModal) openModal(item);
   };
 
+  const description = useMemo(() => {
+    const maxCharacters = item.name.length > 40 ? 60 : 95;
+
+    if (item.description_sale.length > maxCharacters)
+      return `${item.description_sale.substr(0, maxCharacters)}...`;
+    return item.description_sale || '';
+  }, [item.description_sale, item.name.length]);
+
   return (
     <Container>
       <Title>{item.name}</Title>
@@ -61,11 +68,7 @@ const Item: React.FC<ItemProps> = ({ item, openModal }) => {
           <Image src={item.image} />
         </ImageContainer>
         <Info>
-          <DescriptionText>
-            {item.description_sale.length > maxCharacters
-              ? `${item.description_sale.substr(0, maxCharacters)}...`
-              : item.description_sale || ''}
-          </DescriptionText>
+          <DescriptionText>{description}</DescriptionText>
           <PriceContainer>
             <Price>{formatReal(item.price)}</Price>
           </PriceContainer>
