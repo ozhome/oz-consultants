@@ -3,6 +3,7 @@ import api from '../services/api';
 
 import ICategory from '../DTOS/ICategory';
 import IItem from '../DTOS/IItem';
+import handleItem from '../utils/handleItem';
 
 interface InventoryContextData {
   categories: ICategory[];
@@ -99,22 +100,7 @@ const InventoryProvider: React.FC = ({ children }) => {
     setProducts(state =>
       state.map(product => {
         if (product.id === item.id) {
-          let { quantity } = product;
-          const sum = insertInput
-            ? item.quantity
-            : product.quantity + item.quantity;
-          let { qty_available } = product;
-
-          if (product.to_weight)
-            qty_available = parseFloat(
-              `${product.qty_available * 1000}`.replace(/\D/g, ''),
-            );
-
-          if (sum > qty_available) quantity = qty_available;
-          else if (sum <= 0) quantity = 0;
-          else quantity = sum;
-
-          return { ...product, quantity };
+          return handleItem(product, item, insertInput);
         }
         return product;
       }),

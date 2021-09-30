@@ -9,6 +9,7 @@ import Dinero from 'dinero.js';
 
 import IItem from '../DTOS/IItem';
 import IParamsOrder from '../DTOS/IParamsOrder';
+import handleItem from '../utils/handleItem';
 
 interface CartContextData {
   cart: IItem[];
@@ -29,30 +30,18 @@ const CartProvider: React.FC = ({ children }) => {
   const updateCart = useCallback((item: IItem, insertInput = false) => {
     setCart(state => {
       const itemIndex = state.findIndex(product => product.id === item.id);
-      let { qty_available } = item;
-      let quantity = 0;
-      let sum = item.quantity;
 
-      if (item.to_weight)
-        qty_available = parseFloat(
-          `${item.qty_available * 1000}`.replace(/\D/g, ''),
-        );
-
-      if (!insertInput) {
-        if (itemIndex >= 0) sum = state[itemIndex].quantity + item.quantity;
-        else sum = item.quantity;
+      if (itemIndex >= 0) {
+        const productUpdated = handleItem(state[itemIndex], item, insertInput);
+        return state
+          .map(product => {
+            if (product.id === productUpdated.id) return productUpdated;
+            return product;
+          })
+          .filter(product => product.quantity);
       }
-
-      if (sum > qty_available) quantity = qty_available;
-      else if (sum <= 0) quantity = 0;
-      else quantity = sum;
-
-      const items = state;
-
-      if (itemIndex >= 0) items[itemIndex].quantity = quantity;
-      else items.push({ ...item, quantity });
-
-      return items.filter(product => product.quantity > 0);
+      const product = handleItem({ ...item, quantity: 0 }, item, insertInput);
+      return [...state, product];
     });
   }, []);
 
