@@ -6,4 +6,5 @@ export default interface ICategory {
   name: string;
   parent_id?: number;
   has_product?: boolean;
+  has_children_product?: boolean;
 }

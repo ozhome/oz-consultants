@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Header from '../../components/StoreHeader';
@@ -9,15 +9,12 @@ import Cart from '../../components/Cart';
 import { useInventory } from '../../hooks/inventory';
 import { useAlert } from '../../hooks/alert';
 
-import ICategory from '../../DTOS/ICategory';
 import IItem from '../../DTOS/IItem';
 
 import { Categories, Container, Content } from './styles';
-import { useStore } from '../../hooks/store';
 
 const Items: React.FC = () => {
   const { push } = useHistory();
-  const { store } = useStore();
   const {
     selectedSub,
     selectedCateg,
@@ -27,8 +24,6 @@ const Items: React.FC = () => {
     selectedSubcategory,
   } = useInventory();
   const { addAlert } = useAlert();
-
-  const [data, setData] = useState<ICategory[]>([]);
 
   const openModal = useCallback(
     (item: IItem) => {
@@ -45,18 +40,24 @@ const Items: React.FC = () => {
     [addAlert],
   );
 
-  const updateCateg = (id: number) => {
-    selectedCategory(id);
-    push('/subcategories');
-  };
+  const handleCategory = useCallback(
+    (id: number, isCategory = false) => {
+      if (isCategory) {
+        selectedCategory(id);
+        push('/subcategories');
+      } else {
+        selectedSubcategory(id);
+        push('/items');
+      }
+    },
+    [push, selectedCategory, selectedSubcategory],
+  );
 
-  useEffect(() => {
-    if (store.is_external_consultant) {
-      setData(categories.filter(item => item.parent_id === selectedCateg));
-    } else {
-      setData(categories.filter(item => item.has_product));
-    }
-  }, [categories, selectedCateg, store.is_external_consultant]);
+  const subCategories = useMemo(() => {
+    return categories.filter(
+      category => category.has_product && category.parent_id === selectedCateg,
+    );
+  }, [categories, selectedCateg]);
 
   return (
     <>
@@ -67,7 +68,7 @@ const Items: React.FC = () => {
             <h3>Categorias</h3>
             <div>
               {categories
-                .filter(item => !item.parent_id && item.idOdoo !== 25)
+                .filter(item => item.has_children_product && item.idOdoo !== 25)
                 .map(item => (
                   <button
                     className={
@@ -75,7 +76,7 @@ const Items: React.FC = () => {
                     }
                     key={item.id}
                     type="button"
-                    onClick={() => updateCateg(item.idOdoo)}
+                    onClick={() => handleCategory(item.idOdoo, true)}
                   >
                     {item.name}
                   </button>
@@ -86,12 +87,12 @@ const Items: React.FC = () => {
           <section>
             <h3>Subcategorias</h3>
             <div>
-              {data.map(item => (
+              {subCategories.map(item => (
                 <button
                   className={item.idOdoo === selectedSub ? 'active' : 'inative'}
                   key={item.id}
                   type="button"
-                  onClick={() => selectedSubcategory(item.idOdoo)}
+                  onClick={() => handleCategory(item.idOdoo)}
                 >
                   {item.name}
                 </button>
@@ -102,13 +103,13 @@ const Items: React.FC = () => {
         <hr />
         <Content>
           <h3>
-            {data.length
+            {subCategories.length
               ? 'Por favor selecione os produtos que deseja'
               : 'Infelizmente não encontramos nenhum produto.\n' +
                 'Utilize o menu para voltar'}
           </h3>
           <Categories>
-            {data.map(item => (
+            {subCategories.map(item => (
               <button
                 key={item.id}
                 type="button"

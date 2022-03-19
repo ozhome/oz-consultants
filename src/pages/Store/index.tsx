@@ -10,6 +10,8 @@ import { useInventory } from '../../hooks/inventory';
 import { useStore } from '../../hooks/store';
 import { useToast } from '../../hooks/toast';
 
+import formatDocument from '../../utils/formatDocument';
+
 import ICategory from '../../DTOS/ICategory';
 
 import { Container, Content } from './styles';
@@ -33,9 +35,7 @@ const Store: React.FC = () => {
   } = useInventory();
 
   const [modal, setModal] = useState(true);
-  const [data, setData] = useState<ICategory[]>(
-    categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25),
-  );
+  const [data, setData] = useState<ICategory[]>([]);
 
   const handleCategory = useCallback(
     async (id: number) => {
@@ -51,7 +51,11 @@ const Store: React.FC = () => {
 
   useEffect(() => {
     const get = async () => {
-      if (store?.document === cpf) {
+      if (
+        store?.document &&
+        cpf &&
+        formatDocument(store?.document) === formatDocument(cpf)
+      ) {
         setModal(false);
         return;
       }
@@ -64,14 +68,17 @@ const Store: React.FC = () => {
           type: 'error',
         });
         push('/');
-        return;
-      } finally {
         setModal(false);
+        return;
       }
       try {
         if (is_external) {
           await getExternalConsultant();
         } else {
+          addToast({
+            title: 'Pesquisando produtos',
+            type: 'info',
+          });
           await getCategories();
         }
       } catch {
@@ -85,10 +92,13 @@ const Store: React.FC = () => {
       }
     };
     get();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    setData(categories.filter(ca => !ca.parent_id && ca.idOdoo !== 25));
+    setData(
+      categories.filter(ca => ca.has_children_product && ca.idOdoo !== 25),
+    );
   }, [categories]);
 
   return (

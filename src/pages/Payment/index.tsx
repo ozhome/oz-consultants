@@ -180,7 +180,7 @@ const Payment: React.FC = () => {
           <h3>Categorias</h3>
           <div>
             {categories
-              .filter(item => !item.parent_id && item.idOdoo !== 25)
+              .filter(item => item.has_children_product && item.idOdoo !== 25)
               .map(item => (
                 <button
                   className="inative"

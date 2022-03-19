@@ -29,23 +29,26 @@ const InventoryProvider: React.FC = ({ children }) => {
   const [products, setProducts] = useState<IItem[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
 
-  const getCategories = useCallback(async () => {
-    const { data } = await api.get('/categories/');
-    setCategories(data);
-  }, []);
-
   const setIventory = useCallback(
     (data: IItem[], currentCategories: ICategory[], items?: IItem[]) => {
-      const categoriesChildren = currentCategories.map(category => {
-        if (
-          data.findIndex(
-            (product: IItem) => product.pos_categ_id === category.idOdoo,
-          ) === -1
-        ) {
-          return { ...category, has_product: false };
-        }
-        return { ...category, has_product: true };
-      });
+      const categoriesChildren = currentCategories
+        .map(category => {
+          if (
+            data.findIndex(
+              (product: IItem) => product.pos_categ_id === category.idOdoo,
+            ) === -1
+          ) {
+            return { ...category, has_product: false };
+          }
+          return { ...category, has_product: true };
+        })
+        .map((category, _, self) => {
+          const has_children_product = self.find(
+            c => c.parent_id === category.idOdoo && c.has_product,
+          );
+
+          return { ...category, has_children_product: !!has_children_product };
+        });
 
       const sub = categoriesChildren.find(ct => ct.has_product);
       setSelectedSub(sub?.idOdoo || 0);
@@ -64,6 +67,41 @@ const InventoryProvider: React.FC = ({ children }) => {
     },
     [],
   );
+
+  const getCategories = useCallback(async () => {
+    const { data } = await api.get('/categories/');
+
+    const productsUpdate: IItem[] = [];
+    const categoryForApi: any = [[]];
+    let index = 0;
+
+    data.forEach((category: ICategory) => {
+      if (categoryForApi[index].length === 10) {
+        categoryForApi.push([]);
+        index += 1;
+      }
+      categoryForApi[index].push(category);
+    });
+
+    await Promise.all(
+      categoryForApi.map(async (categoriesApi: ICategory[]) => {
+        try {
+          const { data: dataProducts } = await api.post('/products/', {
+            categories: categoriesApi.map(c => c.id),
+          });
+
+          if (dataProducts) {
+            productsUpdate.push(...dataProducts);
+          }
+        } catch {
+          // TODO
+        }
+        return categoriesApi;
+      }),
+    );
+
+    setIventory(productsUpdate, data);
+  }, [setIventory]);
 
   const getInventory = useCallback(
     async (items: IItem[]) => {
@@ -86,14 +124,9 @@ const InventoryProvider: React.FC = ({ children }) => {
   const selectedCategory = useCallback(
     (id: number) => {
       setSelectedCateg(id);
-      const index = categories.findIndex(category => category.parent_id === id);
-      if (index === -1) {
-        selectedSubcategory(id);
-      } else {
-        selectedSubcategory(categories[index].idOdoo);
-      }
+      selectedSubcategory(id);
     },
-    [categories, selectedSubcategory],
+    [selectedSubcategory],
   );
 
   const updateInventory = useCallback((item: IItem, insertInput = false) => {

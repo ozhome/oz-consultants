@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Category from '../../components/Category';
@@ -7,9 +7,6 @@ import Modal from '../../components/Modal';
 import Cart from '../../components/Cart';
 
 import { useInventory } from '../../hooks/inventory';
-import { useCart } from '../../hooks/cart';
-
-import ICategory from '../../DTOS/ICategory';
 
 import { Container, Content } from './styles';
 import { useStore } from '../../hooks/store';
@@ -23,26 +20,36 @@ const SubCategories: React.FC = () => {
     selectedSub,
     selectedCateg,
     categories,
-    getInventory,
     selectedCategory,
     selectedSubcategory,
   } = useInventory();
   const { push } = useHistory();
   const { store } = useStore();
-  const { cart } = useCart();
   const [modal, setModal] = useState(true);
 
-  const [data, setData] = useState<ICategory[]>(
-    categories.filter(
-      item => item.has_product && item.parent_id === selectedCateg,
-    ),
+  const handleCategory = useCallback(
+    (id: number, isCategory = false) => {
+      if (isCategory) {
+        selectedCategory(id);
+        push('/subcategories');
+      } else {
+        selectedSubcategory(id);
+        push('/items');
+      }
+    },
+    [push, selectedCategory, selectedSubcategory],
   );
+
+  const subCategories = useMemo(() => {
+    return categories.filter(
+      category => category.has_product && category.parent_id === selectedCateg,
+    );
+  }, [categories, selectedCateg]);
 
   useEffect(() => {
     const get = async () => {
       try {
         if (!selectedCateg) push('/');
-        if (!store.is_external_consultant) await getInventory(cart);
       } catch {
         // TODO
       } finally {
@@ -52,16 +59,7 @@ const SubCategories: React.FC = () => {
 
     setModal(true);
     get();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCateg, store.is_external_consultant]);
-
-  useEffect(() => {
-    setData(
-      categories.filter(
-        item => item.has_product && item.parent_id === selectedCateg,
-      ),
-    );
-  }, [categories, selectedCateg]);
+  }, [push, selectedCateg, store.is_external_consultant]);
 
   return (
     <>
@@ -73,7 +71,7 @@ const SubCategories: React.FC = () => {
             <h3>Categorias</h3>
             <div>
               {categories
-                .filter(item => !item.parent_id && item.idOdoo !== 25)
+                .filter(item => item.has_children_product && item.idOdoo !== 25)
                 .map(item => (
                   <button
                     className={
@@ -81,7 +79,7 @@ const SubCategories: React.FC = () => {
                     }
                     key={item.id}
                     type="button"
-                    onClick={() => selectedCategory(item.idOdoo)}
+                    onClick={() => handleCategory(item.idOdoo, true)}
                   >
                     {item.name}
                   </button>
@@ -92,12 +90,12 @@ const SubCategories: React.FC = () => {
           <section>
             <h3>Subcategorias</h3>
             <div>
-              {data.map(item => (
+              {subCategories.map(item => (
                 <button
                   className={item.idOdoo === selectedSub ? 'active' : 'inative'}
                   key={item.id}
                   type="button"
-                  onClick={() => selectedSubcategory(item.idOdoo)}
+                  onClick={() => handleCategory(item.idOdoo)}
                 >
                   {item.name}
                 </button>
@@ -108,13 +106,13 @@ const SubCategories: React.FC = () => {
         <hr />
         <Content>
           <h3>
-            {data.length
+            {subCategories.length
               ? 'Por favor selecione uma categoria que deseja'
               : 'Infelizmente não encontramos nenhum para essa categoria.\n' +
                 'Utilize o menu para voltar'}
           </h3>
           <div>
-            {data.map(item => (
+            {subCategories.map(item => (
               <Category
                 key={item.id}
                 image={item.image}
