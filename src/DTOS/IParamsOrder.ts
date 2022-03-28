@@ -30,5 +30,6 @@ export default interface IParamsOrder {
     name: string;
     to_weight: boolean;
     discount?: number;
+    pos_categ_id: number;
   }[];
 }

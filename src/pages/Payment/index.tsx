@@ -99,6 +99,7 @@ const Payment: React.FC = () => {
           name: product.name,
           to_weight: product.to_weight,
           discount: product.discount,
+          pos_categ_id: product.pos_categ_id,
         }));
 
         const amountInCents = parseFloat(amount.toFixed(2).replace(/\D/g, ''));
